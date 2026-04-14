@@ -36,6 +36,17 @@ terraform output -raw rds_endpoint
 terraform output ecr_repository_urls
 ```
 
+For local runs, Terraform also needs the two secret inputs. Use either:
+
+```bash
+# Option 1: environment variables
+export TF_VAR_db_password='<postgres-password>'
+export TF_VAR_rabbitmq_password='<rabbitmq-password>'
+
+# Option 2: local-only file (recommended for repeated runs)
+cp environments/prod/terraform.secrets.auto.tfvars.example environments/prod/terraform.secrets.auto.tfvars
+```
+
 Database migrations (run after first apply):
 ```bash
 PGPASSWORD=$TF_VAR_db_password psql \

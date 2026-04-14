@@ -1,4 +1,4 @@
-# Security Group — only EKS worker nodes can reach RDS on port 5432
+# Security Group - only EKS worker nodes can reach RDS on port 5432
 resource "aws_security_group" "rds" {
   name        = "securestay-rds-sg"
   description = "PostgreSQL access from EKS worker nodes only"
@@ -27,7 +27,7 @@ resource "aws_security_group" "rds" {
   }
 }
 
-# DB Subnet Group — private subnets only, enables multi-AZ
+# DB Subnet Group - private subnets only
 resource "aws_db_subnet_group" "securestay" {
   name       = "securestay-db-subnet-group"
   subnet_ids = var.private_subnet_ids
@@ -38,14 +38,14 @@ resource "aws_db_subnet_group" "securestay" {
   }
 }
 
-# RDS PostgreSQL — single shared instance for all four microservices
+# RDS PostgreSQL - single shared instance for all four microservices
 resource "aws_db_instance" "securestay" {
   identifier            = "securestay-postgres"
   engine                = "postgres"
   engine_version        = "15.4"
   instance_class        = "db.t3.micro"
   allocated_storage     = 20
-  max_allocated_storage = 100
+  max_allocated_storage = 20
   storage_type          = "gp3"
   storage_encrypted     = true
 
@@ -53,7 +53,7 @@ resource "aws_db_instance" "securestay" {
   username = var.db_username
   password = var.db_password
 
-  multi_az            = true
+  multi_az            = false
   publicly_accessible = false
 
   skip_final_snapshot       = false
@@ -63,10 +63,10 @@ resource "aws_db_instance" "securestay" {
   vpc_security_group_ids = [aws_security_group.rds.id]
   db_subnet_group_name   = aws_db_subnet_group.securestay.name
 
-  backup_retention_period      = 7
-  backup_window                = "03:00-04:00"
+  # Free Tier accounts can be restricted to a zero-day retention period.
+  backup_retention_period      = 0
   maintenance_window           = "Mon:04:00-Mon:05:00"
-  performance_insights_enabled = true
+  performance_insights_enabled = false
 
   tags = {
     Project     = "SecureStay"

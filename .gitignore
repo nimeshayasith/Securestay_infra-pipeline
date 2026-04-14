@@ -13,6 +13,7 @@ tfplan
 
 # Terraform variable files that may contain secrets
 *.auto.tfvars
+*.auto.tfvars.example
 # terraform.tfvars is committed — it contains only non-secret values
 
 # Crash log files

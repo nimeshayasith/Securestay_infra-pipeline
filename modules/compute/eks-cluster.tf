@@ -27,12 +27,13 @@ resource "aws_eks_node_group" "workers" {
   subnet_ids      = var.private_subnet_ids
 
   scaling_config {
-    desired_size = 2
+    desired_size = 1
     min_size     = 1
-    max_size     = 4
+    max_size     = 2
   }
 
-  instance_types = ["t3.medium"]
+  # Keep the default worker pool Free Tier-friendly for local/student AWS accounts.
+  instance_types = ["t3.micro"]
 
   update_config {
     max_unavailable = 1
