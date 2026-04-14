@@ -6,9 +6,7 @@ auth:
   erlangCookie: "REPLACE_WITH_LONG_RANDOM_SECRET_64_CHARS"
 
 persistence:
-  enabled: true
-  size: 8Gi
-  storageClass: "gp2"
+  enabled: false
 
 service:
   type: LoadBalancer
