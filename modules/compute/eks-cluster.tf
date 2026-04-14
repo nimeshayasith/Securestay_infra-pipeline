@@ -1,3 +1,12 @@
+locals {
+  eks_node_role_name = element(split("/", var.eks_node_role_arn), length(split("/", var.eks_node_role_arn)) - 1)
+}
+
+resource "aws_iam_role_policy_attachment" "ebs_csi_node_policy" {
+  role       = local.eks_node_role_name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+}
+
 resource "aws_eks_cluster" "securestay" {
   name     = var.cluster_name
   version  = "1.29"
@@ -45,30 +54,49 @@ resource "aws_eks_node_group" "workers" {
     ManagedBy   = "Terraform"
   }
 
-  depends_on = [aws_eks_cluster.securestay]
+  depends_on = [
+    aws_eks_cluster.securestay,
+    aws_iam_role_policy_attachment.ebs_csi_node_policy,
+  ]
 }
 
 # Managed add-ons
 resource "aws_eks_addon" "coredns" {
-  cluster_name = aws_eks_cluster.securestay.name
-  addon_name   = "coredns"
-  depends_on   = [aws_eks_node_group.workers]
+  cluster_name                = aws_eks_cluster.securestay.name
+  addon_name                  = "coredns"
+  resolve_conflicts_on_create = "OVERWRITE"
+  resolve_conflicts_on_update = "OVERWRITE"
+  depends_on                  = [aws_eks_node_group.workers]
 }
 
 resource "aws_eks_addon" "kube_proxy" {
-  cluster_name = aws_eks_cluster.securestay.name
-  addon_name   = "kube-proxy"
-  depends_on   = [aws_eks_node_group.workers]
+  cluster_name                = aws_eks_cluster.securestay.name
+  addon_name                  = "kube-proxy"
+  resolve_conflicts_on_create = "OVERWRITE"
+  resolve_conflicts_on_update = "OVERWRITE"
+  depends_on                  = [aws_eks_node_group.workers]
 }
 
 resource "aws_eks_addon" "vpc_cni" {
-  cluster_name = aws_eks_cluster.securestay.name
-  addon_name   = "vpc-cni"
-  depends_on   = [aws_eks_node_group.workers]
+  cluster_name                = aws_eks_cluster.securestay.name
+  addon_name                  = "vpc-cni"
+  resolve_conflicts_on_create = "OVERWRITE"
+  resolve_conflicts_on_update = "OVERWRITE"
+  depends_on                  = [aws_eks_node_group.workers]
 }
 
 resource "aws_eks_addon" "ebs_csi" {
-  cluster_name = aws_eks_cluster.securestay.name
-  addon_name   = "aws-ebs-csi-driver"
-  depends_on   = [aws_eks_node_group.workers]
+  cluster_name                = aws_eks_cluster.securestay.name
+  addon_name                  = "aws-ebs-csi-driver"
+  resolve_conflicts_on_create = "OVERWRITE"
+  resolve_conflicts_on_update = "OVERWRITE"
+  depends_on = [
+    aws_eks_node_group.workers,
+    aws_iam_role_policy_attachment.ebs_csi_node_policy,
+  ]
+
+  timeouts {
+    create = "40m"
+    update = "40m"
+  }
 }

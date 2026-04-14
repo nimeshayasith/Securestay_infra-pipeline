@@ -42,7 +42,7 @@ resource "aws_db_subnet_group" "securestay" {
 resource "aws_db_instance" "securestay" {
   identifier            = "securestay-postgres"
   engine                = "postgres"
-  engine_version        = "15.4"
+  engine_version        = "16.4"
   instance_class        = "db.t3.micro"
   allocated_storage     = 20
   max_allocated_storage = 20
