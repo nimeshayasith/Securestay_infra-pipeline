@@ -3,7 +3,7 @@ replicaCount: 1
 auth:
   username: securestay_admin
   # password is injected via set_sensitive in modules/rabbitmq/main.tf
-  erlangCookie: "REPLACE_WITH_LONG_RANDOM_SECRET_64_CHARS"
+  erlangCookie: "E332F52C546C70618E29498837ADACECABFBEB2051765AE4D62BE728CA171CB0"
 
 persistence:
   enabled: false
