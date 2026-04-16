@@ -38,9 +38,18 @@ module "database" {
 }
 
 module "rabbitmq" {
-  source            = "../../modules/rabbitmq"
-  rabbitmq_password = var.rabbitmq_password
-  depends_on        = [module.compute]
+  source                        = "../../modules/rabbitmq"
+  rabbitmq_password             = var.rabbitmq_password
+  rabbitmq_wait                 = false
+  rabbitmq_timeout              = 300
+  rabbitmq_service_type         = "ClusterIP"
+  rabbitmq_persistence_enabled  = false
+  rabbitmq_metrics_enabled      = false
+  rabbitmq_requests_cpu         = "50m"
+  rabbitmq_requests_memory      = "128Mi"
+  rabbitmq_limits_cpu           = "250m"
+  rabbitmq_limits_memory        = "256Mi"
+  depends_on                    = [module.compute]
 }
 
 module "dns" {
