@@ -56,9 +56,8 @@ resource "aws_db_instance" "securestay" {
   multi_az            = false
   publicly_accessible = false
 
-  skip_final_snapshot       = false
-  final_snapshot_identifier = "securestay-postgres-final-snapshot"
-  deletion_protection       = true
+  skip_final_snapshot = true
+  deletion_protection = false
 
   vpc_security_group_ids = [aws_security_group.rds.id]
   db_subnet_group_name   = aws_db_subnet_group.securestay.name
@@ -73,6 +72,4 @@ resource "aws_db_instance" "securestay" {
     Environment = "prod"
     ManagedBy   = "Terraform"
   }
-
-  lifecycle { prevent_destroy = true }
 }

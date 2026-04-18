@@ -3,7 +3,8 @@ data "aws_caller_identity" "current" {}
 # ── App Assets Bucket ─────────────────────────────────────────────────────────
 
 resource "aws_s3_bucket" "app_assets" {
-  bucket = "securestay-app-assets-${data.aws_caller_identity.current.account_id}"
+  bucket        = "securestay-app-assets-${data.aws_caller_identity.current.account_id}"
+  force_destroy = true
 
   tags = {
     Name        = "securestay-app-assets"
@@ -11,8 +12,6 @@ resource "aws_s3_bucket" "app_assets" {
     Environment = "prod"
     ManagedBy   = "Terraform"
   }
-
-  lifecycle { prevent_destroy = true }
 }
 
 resource "aws_s3_bucket_versioning" "app_assets" {
@@ -38,7 +37,8 @@ resource "aws_s3_bucket_public_access_block" "app_assets" {
 # ── Access Logs Bucket ────────────────────────────────────────────────────────
 
 resource "aws_s3_bucket" "access_logs" {
-  bucket = "securestay-access-logs-${data.aws_caller_identity.current.account_id}"
+  bucket        = "securestay-access-logs-${data.aws_caller_identity.current.account_id}"
+  force_destroy = true
 
   tags = {
     Name        = "securestay-access-logs"

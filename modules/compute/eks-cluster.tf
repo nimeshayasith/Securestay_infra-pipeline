@@ -76,5 +76,5 @@ resource "aws_eks_addon" "vpc_cni" {
       WARM_PREFIX_TARGET       = "1"
     }
   })
-  depends_on                  = [aws_eks_node_group.workers]
+  depends_on = [aws_eks_node_group.workers]
 }
