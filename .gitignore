@@ -1,0 +1,46 @@
+# Terraform state files
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# Terraform plan files
+*.tfplan
+tfplan
+
+# Terraform working directories
+**/.terraform/
+# .terraform.lock.hcl is committed — locks provider versions for reproducible applies
+
+# Terraform variable files that may contain secrets
+*.auto.tfvars
+# *.auto.tfvars.example is committed — it is a safe template with no real secrets
+# terraform.tfvars is committed — it contains only non-secret values
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI config
+.terraformrc
+terraform.rc
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# AWS credentials
+.aws/
+
+# Scripts temp files
+*.sh.log

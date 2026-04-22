@@ -1,0 +1,22 @@
+replicaCount: 1
+
+auth:
+  username: securestay_admin
+  erlangCookie: "E332F52C546C70618E29498837ADACECABFBEB2051765AE4D62BE728CA171CB0"
+
+persistence:
+  enabled: false
+
+service:
+  type: ClusterIP
+
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "50m"
+  limits:
+    memory: "256Mi"
+    cpu: "250m"
+
+metrics:
+  enabled: false
