@@ -1,6 +1,6 @@
 resource "aws_eks_cluster" "securestay" {
   name     = var.cluster_name
-  version  = "1.29"
+  version  = "1.30"
   role_arn = var.eks_cluster_role_arn
 
   vpc_config {

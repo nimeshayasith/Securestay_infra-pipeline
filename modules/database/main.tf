@@ -55,6 +55,7 @@ resource "aws_db_instance" "securestay" {
 
   multi_az            = false
   publicly_accessible = false
+  apply_immediately   = true
 
   skip_final_snapshot = true
   deletion_protection = false
