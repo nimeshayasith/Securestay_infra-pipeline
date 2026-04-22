@@ -39,6 +39,12 @@ This repo is responsible for creating and managing:
 4. Merge to `main` to trigger `terraform apply`.
 5. Use the Terraform outputs for application integration.
 
+## Manual Operations
+
+- Run `Infrastructure Apply` from GitHub Actions when you want to recreate the production environment on demand.
+- Run `Infrastructure Destroy` from GitHub Actions when you want to tear the production environment down cleanly.
+- The destroy workflow requires typing `DESTROY` as an explicit confirmation before it will proceed.
+
 ## Learning Goal
 
 The documents in `docs/` explain not only what was built, but also why each part exists, how the pieces connect together, and which best practices were used in the project.
