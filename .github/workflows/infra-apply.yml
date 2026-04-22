@@ -96,6 +96,13 @@ jobs:
         if: steps.alb_controller_sa.outputs.exists != 'true'
         run: echo "Skipping AWS Load Balancer Controller because the required kube-system/aws-load-balancer-controller service account is not present."
 
+      - name: Clean up failed NGINX ingress release
+        run: |
+          helm uninstall ingress-nginx -n ingress-nginx || true
+          kubectl delete job ingress-nginx-admission-create -n ingress-nginx --ignore-not-found=true
+          kubectl delete job ingress-nginx-admission-patch -n ingress-nginx --ignore-not-found=true
+          kubectl delete pod -n ingress-nginx -l app.kubernetes.io/instance=ingress-nginx --ignore-not-found=true
+
       - name: Install NGINX Ingress Controller
         run: |
           helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
@@ -104,6 +111,8 @@ jobs:
             -n ingress-nginx --create-namespace \
             --wait \
             --timeout 15m \
+            --set controller.replicaCount=1 \
+            --set controller.admissionWebhooks.enabled=false \
             --set controller.service.type=LoadBalancer
 
       - name: Print RDS Endpoint
