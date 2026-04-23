@@ -105,10 +105,14 @@ jobs:
 
       - name: Clean up failed NGINX ingress release
         run: |
-          helm uninstall ingress-nginx -n ingress-nginx || true
+          if helm status ingress-nginx -n ingress-nginx >/tmp/ingress-status.txt 2>/dev/null; then
+            if grep -q '^STATUS: failed' /tmp/ingress-status.txt; then
+              helm uninstall ingress-nginx -n ingress-nginx || true
+            fi
+          fi
+
           kubectl delete job ingress-nginx-admission-create -n ingress-nginx --ignore-not-found=true
           kubectl delete job ingress-nginx-admission-patch -n ingress-nginx --ignore-not-found=true
-          kubectl delete pod -n ingress-nginx -l app.kubernetes.io/instance=ingress-nginx --ignore-not-found=true
 
       - name: Install NGINX Ingress Controller
         run: |
@@ -116,11 +120,46 @@ jobs:
           helm repo update
           helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
             -n ingress-nginx --create-namespace \
-            --wait \
-            --timeout 15m \
             --set controller.replicaCount=1 \
             --set controller.admissionWebhooks.enabled=false \
             --set controller.service.type=LoadBalancer
+
+      - name: Wait for NGINX ingress controller rollout
+        run: |
+          kubectl rollout status deployment/ingress-nginx-controller -n ingress-nginx --timeout=15m
+
+      - name: Wait for NGINX ingress service
+        run: |
+          for i in $(seq 1 60); do
+            if kubectl get service ingress-nginx-controller -n ingress-nginx >/dev/null 2>&1; then
+              break
+            fi
+            echo "Waiting for ingress-nginx-controller service to be created..."
+            sleep 10
+          done
+
+          kubectl get service ingress-nginx-controller -n ingress-nginx
+
+      - name: Wait for NGINX load balancer hostname
+        run: |
+          for i in $(seq 1 90); do
+            hostname=$(kubectl get service ingress-nginx-controller -n ingress-nginx -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+            ip=$(kubectl get service ingress-nginx-controller -n ingress-nginx -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+
+            if [ -n "$hostname" ] || [ -n "$ip" ]; then
+              echo "Ingress endpoint: ${hostname:-$ip}"
+              exit 0
+            fi
+
+            echo "Waiting for ingress-nginx LoadBalancer endpoint..."
+            kubectl get service ingress-nginx-controller -n ingress-nginx
+            sleep 10
+          done
+
+          echo "Load balancer endpoint was not assigned within 15 minutes."
+          kubectl get all -n ingress-nginx
+          kubectl get events -n ingress-nginx --sort-by=.lastTimestamp | tail -n 50
+          exit 1
 
       - name: Print RDS Endpoint
         run: |
