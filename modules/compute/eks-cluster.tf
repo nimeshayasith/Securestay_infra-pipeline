@@ -32,8 +32,10 @@ resource "aws_eks_node_group" "workers" {
     max_size     = 3
   }
 
-  # Keep the default worker pool Free Tier-friendly for local/student AWS accounts.
-  instance_types = ["t3.micro"]
+  # t3.micro nodes top out at 4 allocatable pods in this cluster, which leaves
+  # no room for ingress and all application workloads. Use t3.small so the
+  # production pipeline has enough pod capacity to schedule core services.
+  instance_types = ["t3.small"]
 
   update_config {
     max_unavailable = 1
